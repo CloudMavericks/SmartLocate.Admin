@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartLocate.Admin", "src\SmartLocate.Admin.csproj", "{BD2565F4-877F-4A46-A16F-939EF4D7BE21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +12,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD2565F4-877F-4A46-A16F-939EF4D7BE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2565F4-877F-4A46-A16F-939EF4D7BE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD2565F4-877F-4A46-A16F-939EF4D7BE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2565F4-877F-4A46-A16F-939EF4D7BE21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
