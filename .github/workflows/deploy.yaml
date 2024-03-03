@@ -1,0 +1,63 @@
+name: Deploy to Firebase
+
+on:
+  workflow_dispatch:
+    branches: [ "main" ]
+
+env:
+  DOTNET_VERSION: 8.0.100
+
+jobs:
+  publish-app:
+    name: "Publish Application"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Source"
+        uses: actions/checkout@v4
+
+      - name: "Setup .NET"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: "Caching Packages"
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: "Restore Packages"
+        run: dotnet restore src/SmartLocate.Admin.csproj
+
+      - name: "Build Source"
+        run: dotnet build src/SmartLocate.Admin.csproj #--no-restore
+
+      - name: "Publish Files"
+        run: dotnet publish src/SmartLocate.Admin.csproj -c Release -o ${{ env.DOTNET_ROOT }}/publish #--no-restore --no-build
+
+      - name: "Upload Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-app
+          path: ${{ env.DOTNET_ROOT }}/publish
+
+  deploy-to-firebase:
+    name: "Deploy Files"
+    needs: publish-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Source"
+        uses: actions/checkout@v4
+
+      - name: "Download Artifacts"
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-app
+
+      - name: "Install Firebase Tools"
+        run: npm install -g firebase-tools
+
+      - name: "Deploy to Firebase"
+        run: firebase deploy -- token ${{ secrets.FIREBASE_TOKEN }}
