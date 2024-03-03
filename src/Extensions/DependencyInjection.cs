@@ -10,10 +10,10 @@ namespace SmartLocate.Admin.Extensions;
 
 internal static class DependencyInjection
 {
-    internal static IServiceCollection RegisterServices(this IServiceCollection services, string baseAddress)
+    internal static IServiceCollection RegisterServices(this IServiceCollection services, string backendUrl)
     {
         services.AddAuthorizationCore(options => options.DefaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
-        services.AddHttpClient("SmartLocateAPI", client => client.BaseAddress = new Uri(baseAddress)).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+        services.AddHttpClient("SmartLocateAPI", client => client.BaseAddress = new Uri(backendUrl)).AddHttpMessageHandler<AuthorizationHeaderHandler>();
         services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("SmartLocateAPI").EnableIntercept(sp));
         services.AddTransient<AuthenticationStateProvider, ApplicationAuthStateProvider>();
         services.AddTransient<ApplicationAuthStateProvider>();
