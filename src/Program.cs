@@ -7,12 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var backendUrl = builder.Configuration["BACKEND_API"];
-
-if(string.IsNullOrWhiteSpace(backendUrl))
-{
-    throw new Exception("Unable to parse Backend URL from Environment. Please configure it properly.");
-}
+var backendUrl = builder.Configuration["BACKEND_API"] ?? "https://api.smartlocate.maverick-apps.com";
 
 builder.Services.RegisterServices(backendUrl);
 
