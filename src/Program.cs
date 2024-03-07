@@ -7,7 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-var backendUrl = builder.Configuration["BACKEND_API"] ?? "https://api.smartlocate.maverick-apps.com";
+var backendUrl = builder.Configuration["BACKEND_API"] ?? "http://localhost:7000";
 
 builder.Services.RegisterServices(backendUrl);
 

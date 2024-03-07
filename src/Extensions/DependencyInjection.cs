@@ -32,6 +32,7 @@ internal static class DependencyInjection
         services.AddTransient<BusHttpClient>();
         services.AddTransient<BusDriverHttpClient>();
         services.AddTransient<BusRouteHttpClient>();
+        services.AddTransient<SearchHttpClient>();
         services.AddTransient<StudentHttpClient>();
     }
 }

@@ -1,6 +1,8 @@
 ﻿@using SmartLocate.Admin.Services.HttpClients
+@using SmartLocate.Admin.Models.Search
 @using SmartLocate.Admin.Models.Students
 @inject StudentHttpClient StudentHttpClient
+@inject SearchHttpClient SearchHttpClient
 
 <EditForm Model="Model" OnValidSubmit="SubmitAsync">
     <DataAnnotationsValidator />
@@ -22,6 +24,19 @@
                     <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Label="Phone Number" 
                                   @bind-Value="@Model.PhoneNumber" For="@(() => Model.PhoneNumber)" />
                 </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudAutocomplete T="BusRouteSearchResponse" Variant="@Variant.Outlined" Margin="@Margin.Dense" Dense
+                                 DebounceInterval="500" @bind-Value="@SelectedBusRoute" SearchFuncWithCancel="@FetchBusRoutes"
+                                 AdornmentIcon="@Icons.Material.Filled.Search" ShowProgressIndicator="@_isFetchingBusRoutes"
+                                 Adornment="@Adornment.Start" ProgressIndicatorColor="@Color.Primary" Label="Bus Route">
+                        <ItemTemplate Context="busRoute">
+                            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                                <MudText Typo="Typo.body2">@busRoute.RouteName</MudText>
+                                <MudChip Size="Size.Small" Color="Color.Primary" Class="my-n2">@busRoute.RouteNumber</MudChip>
+                            </MudStack>
+                        </ItemTemplate>
+                    </MudAutocomplete>
+                </MudItem>
                 <MudItem xs="12">
                     <MudTextField Margin="Margin.Dense" Variant="Variant.Outlined" Label="Address" 
                                   @bind-Value="@Model.Address" For="@(() => Model.Address)" />
@@ -39,14 +54,50 @@
     
     [Parameter]
     public UpdateStudentRequest Model { get; set; } = new();
+
+    [Parameter]
+    public int DefaultBusRouteNumber { get; set; }
+
+    private bool _isFetchingBusRoutes;
+    private List<BusRouteSearchResponse> BusRoutes { get; set; } = new();
+    private BusRouteSearchResponse SelectedBusRoute { get; set; }
     
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await FetchBusRoutes(Model.DefaultBusRouteId.ToString());
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task<IEnumerable<BusRouteSearchResponse>> FetchBusRoutes(string arg, CancellationToken cancellationToken = default)
+    {
+        _isFetchingBusRoutes = true;
+        try
+        {
+            BusRoutes = await SearchHttpClient.SearchBusRoutes(arg, cancellationToken);
+            _isFetchingBusRoutes = false;
+            return BusRoutes;
+        }
+        catch (Exception e)
+        {
+            _isFetchingBusRoutes = false;
+            Snackbar.Add($"Error: {e.Message}", Severity.Error);
+            return [];
+        }
+    }
     
     private async Task SubmitAsync()
     {
         try
         {
+            if(SelectedBusRoute == null)
+            {
+                Snackbar.Add("Please select a Bus Route", Severity.Warning);
+                return;
+            }
+            Model.DefaultBusRouteId = SelectedBusRoute.Id;
             await StudentHttpClient.UpdateAsync(Model);
             Snackbar.Add("Student updated successfully.", Severity.Success);
             MudDialog.Close();

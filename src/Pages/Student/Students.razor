@@ -148,6 +148,9 @@
                 DefaultBusRouteId = supplierResponse.DefaultBusRouteId,
                 // DefaultPickupDropOffLocation = supplierResponse.DefaultPickupDropOffLocation,
             }
+        }, 
+        {
+            nameof(EditStudentDialog.DefaultBusRouteNumber), supplierResponse.DefaultBusRouteNumber
         } };
         var dialog = await DialogService.ShowAsync<EditStudentDialog>("Edit Student", parameters, dialogOptions);
         var result = await dialog.Result;
